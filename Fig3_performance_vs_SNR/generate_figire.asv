@@ -1,0 +1,153 @@
+clc
+clear
+
+
+y=zeros(4,6);
+sr=zeros(4,6);
+crlb=zeros(4,6);
+
+load data_ML_SGPI_iter40.mat
+
+y(1,:)=mean(Obj_all);
+sr(1,:)=mean(SR_all);
+crlb(1,:)=mean(CRB_all);
+
+t1=mean(Time_all);
+load data_SGPI_Eig.mat
+
+y(2,:)=mean(Obj_all);
+sr(2,:)=mean(SR_all);
+crlb(2,:)=mean(CRB_all);
+t2=mean(Time_all);
+load data_SGPI_Ger.mat
+
+y(3,:)=mean(Obj_all);
+sr(3,:)=mean(SR_all);
+crlb(3,:)=mean(CRB_all);
+t3=mean(Time_all);
+load data_SGPI_fixed.mat
+
+y(4,:)=mean(Obj_all);
+sr(4,:)=mean(SR_all);
+crlb(4,:)=mean(CRB_all);
+t4=mean(Time_all);
+
+
+schemeNames={'SGPI-Deep', 'SGPI-Eig','SGPI-Gersh', 'SGPI-Fixed'};
+K=2:2:12;
+numSchemes=4;
+SR=sr;
+CRLB=crlb;
+objective=y;
+
+
+
+figure 
+yyaxis left
+for i=1:numSchemes
+    plot(K,sr(i,:),'-o','Color',color(i),'DisplayName', [schemeNames{i} ' SR']);
+    hold on
+    plot(K,y(i,:),'--','Color',color(i),'DisplayName', [schemeNames{i} ' Obj']);
+end
+ylabel('SR / Objective');
+yyaxis right
+for i=1:numSchemes
+    plot(K, crlb(i,:), ':', 'Color', color(i), ...
+        'DisplayName', [schemeNames{i} ' CRLB']);
+    hold on
+end
+
+ylabel('CRLB');
+
+xlabel('Number of Users K');
+title('All Schemes: Dual Y-Axes');
+legend('Location', 'bestoutside');
+grid on;
+
+
+
+
+figure;
+
+subplot(3,1,1);
+for i = 1:numSchemes
+    plot(K, SR(i,:), '-o', 'Color', color(i)); hold on;
+end
+ylabel('SR');
+title('Spectral Rate vs K');
+
+grid on;
+
+subplot(3,1,2);
+for i = 1:numSchemes
+    plot(K, CRLB(i,:), '-s', 'Color', color(i),'DisplayName', schemeNames{i}); hold on;
+end
+ylabel('CRLB');
+title('CRLB vs K');
+legend('Location', 'best');
+grid on;
+
+subplot(3,1,3);
+for i = 1:numSchemes
+    plot(K, objective(i,:), '-x', 'Color', color(i)); hold on;
+end
+xlabel('Number of Users K');
+ylabel('Objective');
+title('Objective vs K');
+grid on;
+
+sgtitle('ISAC Metrics Comparison Across Schemes');
+
+
+
+figure;
+for i = 1:numSchemes
+    SR_norm = (SR(i,:) - min(SR(i,:))) / (max(SR(i,:)) - min(SR(i,:)));
+    CRLB_norm = (CRLB(i,:) - min(CRLB(i,:))) / (max(CRLB(i,:)) - min(CRLB(i,:)));
+    obj_norm = (objective(i,:) - min(objective(i,:))) / (max(objective(i,:)) - min(objective(i,:)));
+
+    plot(K, SR_norm, '-', 'Color', color(i), 'DisplayName', [schemeNames{i} ' SR']); hold on;
+    plot(K, CRLB_norm, ':', 'Color', colors(i,:), 'DisplayName', [schemeNames{i} ' CRLB']);
+    plot(K, obj_norm, '--', 'Color', colors(i,:), 'DisplayName', [schemeNames{i} ' Obj']);
+end
+xlabel('Number of Users K');
+ylabel('Normalized Metric');
+title('Normalized Metrics Across All Schemes');
+legend('Location', 'bestoutside');
+grid on;
+
+
+% figure;
+% 
+%    hold on;
+%     plot(y1, '-', 'Color',color(1),'LineWidth', 1.5, 'Marker','+'); % Plot Y1 in blue
+% 
+%     plot(y2, '-', 'Color',color(2),'LineWidth', 1.5, 'Marker','square'); % Plot Y2 in red dashed line
+% 
+%     plot(y3,'-','Color',color(3),'LineWidth', 1.5, 'Marker','diamond');
+% 
+%     plot(y4,'-','Color',color(4),'Linewidth',1.5, 'Marker','v')
+% 
+%     xlabel('Number of Communications Users');
+%     ylabel('Objective Value');
+% 
+%     legend('SGPI-Deep', 'SGPI-Eig','SGPI-Gersh', 'SGPI-Fixed','Location','southeast');
+%     grid on;
+% 
+%     figure;
+% 
+%    hold on;
+%     plot(t1, '--', 'Color',color(1),'LineWidth', 1.5, 'Marker','+'); % Plot Y1 in blue
+% 
+%     plot(t2, '--', 'Color',color(2),'LineWidth', 1.5, 'Marker','square'); % Plot Y2 in red dashed line
+% 
+%     plot(t3,'--','Color',color(3),'LineWidth', 1.5, 'Marker','diamond');
+% 
+%     plot(t4,'--','Color',color(4),'Linewidth',1.5, 'Marker','v')
+% 
+%     xlabel('Number of Communications Users');
+%     ylabel('Objective Value');
+% 
+%     legend('SGPI-Deep', 'SGPI-Eig','SGPI-Gersh', 'SGPI-Fixed','Location','southeast');
+%     grid on;
+% 
